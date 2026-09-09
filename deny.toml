@@ -6,6 +6,9 @@ allow = [
   "CDLA-Permissive-2.0",
   "ISC",
   "MIT",
+  # `colored`, pulled in by the `codspeed` benchmark instrumentation
+  # (dev-dependency only)
+  "MPL-2.0",
   "OpenSSL",
   "Unicode-3.0",
   "Zlib",
