@@ -1,0 +1,53 @@
+name: CodSpeed
+
+permissions:
+  contents: read
+  # for OpenID Connect authentication with CodSpeed
+  id-token: write
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+  # `workflow_dispatch` allows CodSpeed to trigger backtest
+  # performance analysis in order to generate initial data.
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  AWS_LC_SYS_NO_JITTER_ENTROPY: 1
+
+jobs:
+  benchmarks:
+    name: Run benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-codspeed
+        uses: taiki-e/cache-cargo-install-action@v3
+        with:
+          tool: cargo-codspeed
+
+      # nb. `verifybench` is deliberately excluded: it uses the unstable
+      # libtest harness, which CodSpeed cannot instrument.
+      - name: Build the benchmark targets
+        run: >
+          cargo codspeed build --locked --measurement-mode simulation
+          -p rustls-test -p rustls-ring -p rustls-aws-lc-rs
+          --bench connection --bench benchmarks
+
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@v5
+        with:
+          mode: simulation
+          run: cargo codspeed run

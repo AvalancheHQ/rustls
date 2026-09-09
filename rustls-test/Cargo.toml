@@ -16,6 +16,7 @@ rustls = { path = "../rustls", default-features = false, features = ["webpki"] }
 tracing = { workspace = true, features = ["std"] }
 
 [dev-dependencies]
+criterion = { workspace = true }
 macro_rules_attribute = { workspace = true }
 num-bigint = { workspace = true }
 pki-types = { workspace = true }
@@ -25,6 +26,11 @@ rustls-util = { path = "../rustls-util", default-features = false }
 x509-parser = { workspace = true }
 webpki = { workspace = true }
 webpki-roots = { workspace = true }
+
+[[bench]]
+name = "connection"
+path = "benches/connection.rs"
+harness = false
 
 [lints]
 workspace = true

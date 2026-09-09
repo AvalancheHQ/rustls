@@ -55,13 +55,13 @@ asn1 = "0.24"
 async-trait = "0.1.74"
 aws-lc-rs = { version = "1.18", default-features = false }
 base64 = "0.23"
-bencher = "0.1.5"
+bencher = { package = "codspeed-bencher-compat", version = "5.0.1" }
 brotli = { version = "9", default-features = false, features = ["std"] }
 brotli-decompressor = "6.0.0"
 byteorder = "1.4.3"
 clap = { version = "4.3.21", features = ["derive", "env"] }
 crabgrind = "0.3"
-criterion = "0.8"
+criterion = { package = "codspeed-criterion-compat", version = "5.0.1" }
 graviola = "0.4"
 hashbrown = { version = "0.17", default-features = false, features = ["default-hasher", "inline-more"] }
 hex = "0.4"

@@ -75,6 +75,35 @@ The benchmarks themselves are located under [ci-bench](ci-bench), together with 
 [repository](https://github.com/rustls/rustls-bench-app) and is deployed to a bare-metal machine to
 ensure low-noise results.
 
+## CodSpeed benchmarks
+
+The `criterion` and `bencher` benchmark targets in the workspace are also measured on every pull
+request by [CodSpeed](https://codspeed.io), which runs them under a CPU simulator and reports the
+instruction-level cost of each scenario. The targets are:
+
+| Target                                                      | What it covers                                                    |
+| ----------------------------------------------------------- | ----------------------------------------------------------------- |
+| [rustls-test/benches/connection.rs](rustls-test/benches/connection.rs) | Full handshakes, resumed handshakes and bulk transfer, for both providers, TLS1.2 and TLS1.3 |
+| [rustls-aws-lc-rs/benches/benchmarks.rs](rustls-aws-lc-rs/benches/benchmarks.rs) | Key exchange (including ML-KEM) and `ClientHello` construction    |
+| [rustls-ring/benches/benchmarks.rs](rustls-ring/benches/benchmarks.rs) | Non-blocking IO handling                                          |
+
+The `criterion` and `bencher` workspace dependencies point at CodSpeed's compatibility layers, which
+behave exactly like the upstream crates outside of CodSpeed's instrumentation. So `cargo bench` keeps
+working locally, and:
+
+```
+cargo codspeed build --measurement-mode simulation \
+  -p rustls-test -p rustls-ring -p rustls-aws-lc-rs \
+  --bench connection --bench benchmarks
+codspeed run --mode simulation -- cargo codspeed run
+```
+
+runs the same measurements CI does (this needs [`cargo-codspeed`][cargo-codspeed] and the
+[`codspeed`][codspeed-cli] CLI).
+
+[cargo-codspeed]: https://codspeed.io/docs/reference/codspeed-rust/cargo-codspeed
+[codspeed-cli]: https://codspeed.io/docs/cli
+
 ## Nightly benchmarks
 
 There are some `#[bench]` benchmarks spread throughout the codebase. We do not use them
